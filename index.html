@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EarnTrack</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #clock {
+        font-family: monospace;
+        font-size: 3vw;
+        width: 100dvw;
+        height: 100dvh;
+        text-align: center;
+        line-height: 100dvh;
+        margin: 0;
+        padding: 0;
+        user-select: none;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: black;
+          color: white;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="clock"></div>
+
+    <script>
+      function readParams(key, defaultValue) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlParam = urlParams.get(key);
+        if (urlParam !== null) {
+          return urlParam;
+        }
+        return defaultValue;
+      }
+
+      function buildTime(hour, minute, second) {
+        const startTime = new Date();
+        startTime.setHours(hour);
+        startTime.setMinutes(minute);
+        startTime.setSeconds(second);
+        return startTime;
+      }
+
+      const secondlySalary = parseFloat(
+        readParams("secondlySalary", "0.0171386169").replace(",", ".")
+      );
+      const startHour = parseInt(readParams("startHour", "9"));
+      const startMinute = parseInt(readParams("startMinute", "0"));
+      const startSecond = parseInt(readParams("startSecond", "0"));
+      const endHour = parseInt(readParams("endHour", "17"));
+      const endMinute = parseInt(readParams("endMinute", "0"));
+      const endSecond = parseInt(readParams("endSecond", "0"));
+
+      const startTime = buildTime(startHour, startMinute, startSecond);
+      const endTime = buildTime(endHour, endMinute, endSecond);
+
+      function updateClock() {
+        const now = new Date();
+        if (now < startTime) {
+          document.getElementById("clock").textContent =
+            "Get some rest, you're not working yet!";
+          return;
+        }
+        if (now > endTime) {
+          const todaySalary = ((endTime - startTime) / 1000.0) * secondlySalary;
+          document.getElementById(
+            "clock"
+          ).textContent = `Well done! You've made ${todaySalary.toFixed(
+            8
+          )} today!`;
+          return;
+        }
+        const secondsSinceStart = (now - startTime) / 1000.0;
+        const currentSalary = secondsSinceStart * secondlySalary;
+        document.getElementById(
+          "clock"
+        ).textContent = `You've made € ${currentSalary.toFixed(8)} today!`;
+      }
+
+      setInterval(updateClock, 100);
+      updateClock();
+    </script>
+  </body>
+</html>
